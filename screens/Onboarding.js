@@ -2,11 +2,22 @@ import { useEffect, useState } from 'react';
 import { View, ScrollView, Text, StyleSheet, TextInput, KeyboardAvoidingView, Platform, Pressable, Image} from 'react-native';
 import { validateEmail, validateName } from '../utils'
 import * as Font from 'expo-font';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Onboarding({navigation}) {
   const [firstName, onChangeFirstName] = useState('');
   const [email, onChangeEmail] = useState('');
   const [clicked, setClicked] = useState(false);
+
+  const storeData = async () => {
+    try {
+      await AsyncStorage.setItem('@onBoard', 'true');
+      await AsyncStorage.setItem('@firstName', firstName);
+      await AsyncStorage.setItem('@email', email);
+    } catch (e) {
+      console.error('Error storing data:', e);
+    }
+  };
 
   const fetchFonts = () => {
     return Font.loadAsync({
@@ -64,6 +75,7 @@ export default function Onboarding({navigation}) {
                 <Pressable
                     style={validateEmail(email) && validateName(firstName) ? styles.button : styles.buttonDisabled}
                     disabled={!validateEmail(email) || !validateName(firstName)}
+                    onPress={() => storeData()}
                     >
                     <Text style={styles.buttonText}>
                     Next
