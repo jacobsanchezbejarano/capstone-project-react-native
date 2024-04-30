@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
-import { View, ScrollView, Text, StyleSheet, TextInput, KeyboardAvoidingView, Platform, Pressable, Image} from 'react-native';
+import { View, TouchableOpacity, ScrollView, Text, StyleSheet, TextInput, KeyboardAvoidingView, Platform, Pressable, Image} from 'react-native';
 import { validateEmail, validateName } from '../utils'
 import * as Font from 'expo-font';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CheckBox } from 'react-native-elements';
 import useUpdate from '../utils/useUpdate';
+import * as ImagePicker from 'expo-image-picker';
 
 export default function Profile({navigation}) {
   const [firstName, onChangeFirstName] = useState('');
@@ -13,6 +14,36 @@ export default function Profile({navigation}) {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [save, setSave] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [image, setImage] = useState(null);
+  const [initials, setInitials] = useState('');
+
+  // Function to handle image selection
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+
+    if (!result.cancelled) {
+      setImage(result.uri);
+    }
+  };
+
+  // Function to generate initials from the user's name
+  const generateInitials = () => {
+    const nameArray = firstName.split(' ');
+    const lastnameArray = lastName.split(' ');
+    const firstInitial = nameArray[0].charAt(0).toUpperCase();
+    const lastNameInitial = lastnameArray[0].charAt(0).toUpperCase();
+    setInitials(firstInitial + lastNameInitial);
+  };
+
+  // Function to handle image upload
+  const handleImageUpload = () => {
+    pickImage();
+  };
 
   const [preferences, setPreferences] = useState({
     status: false,
@@ -57,6 +88,10 @@ export default function Profile({navigation}) {
   useEffect(()=>{
     retrieveData();
   }, [])
+
+  useEffect(()=>{
+    generateInitials();
+  }, [firstName, lastName]);
 
   const updateState = (key) => () =>
     setPreferences((prevState) => ({
@@ -112,6 +147,7 @@ export default function Profile({navigation}) {
   
           <View style={styles.container2}>
             <View style={styles.header}>
+            
                 <Image style={styles.image} resizeMode="contain" source={require("../assets/images/Logo.png")} />
                 <Image source={require("../assets/images/Profile.png")} 
                                 style={styles.imageProfileLittle} 
@@ -124,10 +160,23 @@ export default function Profile({navigation}) {
                     <Text style={styles.mainText}>Personal information</Text>
 
                     <View style={styles.profileBar}>
-                        <Image source={require("../assets/images/Profile.png")} 
-                                style={styles.imageProfile} 
-                                resizeMode="cover" />
-                        <Pressable style={styles.buttonChange}>
+
+                      
+
+                        <TouchableOpacity onPress={handleImageUpload}>
+                          {image ? (
+                            <Image source={{ uri: image }} 
+                            style={styles.imageProfile} 
+                            resizeMode="cover" />
+                            // <Image source={{ uri: image }} style={{ width: 200, height: 200, borderRadius: 100 }} />
+                          ) : (
+                            <View style={styles.imageNoProfile}>
+                              <Text style={{ fontSize: 20, color: '#fff' }}>{initials}</Text>
+                            </View>
+                          )}
+                          
+                        </TouchableOpacity>
+                        <Pressable style={styles.buttonChange} onPress={handleImageUpload}>
                             <Text style={styles.buttonChangeText}>Change</Text>
                         </Pressable>
                         <Pressable style={styles.buttonRemove}>
@@ -308,6 +357,15 @@ const styles = StyleSheet.create({
     height: 70,
     justifyContent: 'center',
     borderRadius: 50,
+    left: 23
+  },
+  imageNoProfile: { 
+    width: 70, 
+    height: 70, 
+    borderRadius: 50, 
+    backgroundColor: '#ccc', 
+    alignItems: 'center', 
+    justifyContent: 'center', 
     left: 23
   },
   imageProfileLittle: {
