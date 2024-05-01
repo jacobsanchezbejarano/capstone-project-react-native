@@ -64,7 +64,9 @@ export default function App() {
         { isOnboardingCompleted ? (
             <>
               <Stack.Screen name="Home" component={Home} /> 
-              <Stack.Screen name="Profile" component={Profile} /> 
+              <Stack.Screen name="Profile">
+                  {props => <Profile {...props} setIsOnboardingCompleted={setIsOnboardingCompleted} />}
+              </Stack.Screen>
             </>
               )
             : <Stack.Screen name="Onboarding">

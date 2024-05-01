@@ -7,7 +7,7 @@ import { CheckBox } from 'react-native-elements';
 import useUpdate from '../utils/useUpdate';
 import * as ImagePicker from 'expo-image-picker';
 
-export default function Profile({navigation}) {
+export default function Profile({navigation, setIsOnboardingCompleted}) {
   const [firstName, onChangeFirstName] = useState('');
   const [lastName, onChangeLastName] = useState('');
   const [email, onChangeEmail] = useState('');
@@ -254,7 +254,7 @@ export default function Profile({navigation}) {
             <View style={styles.logoutView}>
                 <Pressable
                     style={styles.buttonLogout}
-                    onPress={() => storeData()}
+                    onPress={() => setIsOnboardingCompleted(false)}
                     >
                     <Text style={styles.buttonLogoutText}>
                     Logout
