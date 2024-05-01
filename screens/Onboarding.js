@@ -66,17 +66,28 @@ export default function Onboarding({navigation, setIsOnboardingCompleted}) {
                 <ScrollView style={styles.scrollViewContent} keyboardDismissMode="on-drag">
 
 
-                    <Text style={styles.mainText}>Let us get to know you</Text>
+                <View style={styles.hero}>
+
+                  <Text style={styles.titleHero}>Little Lemon</Text>
+                  <View style={styles.heroContainer}>
+                      <View style={styles.heroDiv}>
+                          <Text style={styles.subTitleHero}>Chicago</Text>
+                          <Text style={styles.textHero}>We are a family owned Mediterranean restaurant, focused on traditional recipes served with a modern twist.</Text>
+                      </View>
+                      <Image style={styles.heroImage} resizeMode='cover' source={require("../assets/images/HeroImage.png")}/>
+                  </View>
+
+                </View>
 
                     <View style={styles.inputs}>
-                        <Text style={styles.labelinput} >First name</Text>
+                        <Text style={styles.labelinput} >First name *</Text>
                         <TextInput 
                                 style={styles.input} 
                                 value={firstName} 
                                 onChangeText={onChangeFirstName} 
                             /> 
 
-                        <Text style={styles.labelinput} >Email</Text>
+                        <Text style={styles.labelinput} >Email *</Text>
                         <TextInput 
                                 style={styles.input} 
                                 value={email} 
@@ -108,29 +119,25 @@ export default function Onboarding({navigation, setIsOnboardingCompleted}) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#EDEFEE",
+    backgroundColor: '#fff',
   },
   container2: {
     display: "flex",
     justifyContent: "space-between",
   },
   scrollViewContent: {
-    backgroundColor: "#cecece",
   },
   inputs: {
-    marginTop: '70%',
+    marginTop: '5%',
   },
   header: {
-    backgroundColor: '#dedede',
     flex: 0.11,
   },
   main: {
-    backgroundColor: '#ccc',
     flex: 0.77,
     justifyContent: 'space-between'
   },
   footer: {
-    backgroundColor: '#dedede',
     flex: 0.16, // Ahora ocupa el 40% del espacio disponible
     alignItems: 'flex-end',
     justifyContent: 'center',
@@ -187,7 +194,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#bbb',
     width: '30%',
   },
-  
   buttonText: {
     color: '#fff',
     textAlign: 'center',
@@ -199,10 +205,49 @@ const styles = StyleSheet.create({
     fontSize: 22,
   },
   labelinput: {
-    textAlign: 'center',
+    marginHorizontal: 12,
     fontSize: 22,
+    color: '#aaa',
+    fontWeight: 'bold',
     fontFamily: 'Karla-Regular',
   },
-  
+  hero: {
+    flex: 0.9,
+    justifyContent: 'space-between',
+    backgroundColor: '#495e57',
+    paddingBottom: 25,
+  },
+  titleHero: {
+    paddingHorizontal: 12,
+    color: '#F4CE14',
+    fontFamily: 'MarkaziText-Regular',
+    fontSize: 54,
+  },
+  subTitleHero: {
+    paddingHorizontal: 12,
+    color: '#ffffff',
+    fontFamily: 'Karla-Regular',
+    fontSize: 36,
+  },
+  textHero: {
+    paddingHorizontal: 12,
+    marginTop: 20,
+    color: '#ffffff',
+    fontFamily: 'Karla-Regular',
+    fontSize: 20,
+  },
+  heroImage: {
+    width: '30%',
+    height: 140,
+    borderRadius: 15,
+    marginTop: 20
+  },
+  heroContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+  },
+  heroDiv: {
+    width: '70%',
+  },
 });
 

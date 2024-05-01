@@ -263,11 +263,6 @@ export default function Home({navigation}) {
                             <Image style={styles.heroImage} resizeMode='cover' source={require("../assets/images/HeroImage.png")}/>
                         </View>
 
-                        <View style={styles.profileBar}>
-
-                        
-                        </View>
-
                         <View style={styles.inputs}>
                             <Icon name="search" size={20} style={styles.icon} />
                             <TextInput 

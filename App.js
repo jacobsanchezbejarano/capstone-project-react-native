@@ -18,7 +18,7 @@ export default function App() {
   useEffect(() => {
     // Fetching stored data on component mount
     retrieveData();
-    // clearData()
+    clearData()
   }, []);
 
   const storeData = async () => {
