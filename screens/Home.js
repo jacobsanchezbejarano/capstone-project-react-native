@@ -1,9 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useEffect,useCallback, useState, useMemo } from 'react';
 import { SafeAreaView, View, ScrollView, Text, StyleSheet, TextInput, KeyboardAvoidingView, Platform, Pressable, Image, FlatList} from 'react-native';
+import debounce from 'lodash.debounce';
 import * as Font from 'expo-font';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import useUpdate from '../utils/useUpdate';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import Filters from '../utils/Filters';
+import {getSectionListData, useUpdateEffect} from '../utils';
+
 
 import {
     createTable,
@@ -13,6 +17,8 @@ import {
   } from '../utils/database';
 
   const API_URL = 'https://raw.githubusercontent.com/Meta-Mobile-Developer-PC/Working-With-Data-API/main/capstone.json';
+  const sections = ['Starters', 'Mains', 'Desserts', 'Drinks'];
+
 
 export default function Home({navigation}) {
   const [firstName, onChangeFirstName] = useState('');
@@ -23,6 +29,28 @@ export default function Home({navigation}) {
   const [isLoading, setIsLoading] = useState(true);
   const [image, setImage] = useState(null);
   const [initials, setInitials] = useState('');
+  const [filterSelections, setFilterSelections] = useState(
+    sections.map(() => false)
+  );
+
+  useEffect(() => {
+    (async () => {
+      try {
+        await createTable();
+        let menuItems = await getMenuItems();
+
+        if (!menuItems.length) {
+          menuItems = await fetchData();
+          saveMenuItems(menuItems);
+        }
+
+        setData(menuItems);
+      } catch (e) {
+        // Handle error
+        Alert.alert(e.message);
+      }
+    })();
+  }, []);
 
   const fetchData = async() => {
     // 1. Implement this function
@@ -30,8 +58,6 @@ export default function Home({navigation}) {
       const response = await fetch(API_URL);
       const json = await response.json();
       const response_json = json.menu;
-    //   console.log(response_json);
-      setData(response_json);
       return response_json;
       } catch (error) {
       console.error(error);
@@ -117,8 +143,6 @@ export default function Home({navigation}) {
       if (firstName !== null) onChangeFirstName(firstName);
       if (lastName !== null) onChangeLastName(lastName);
       
-      setIsLoading(false);
-
     } catch (e) {
       console.error('Error retrieving data:', e);
     }
@@ -141,14 +165,43 @@ export default function Home({navigation}) {
     loadFonts();
   }, []);
 
-  const Options = () => {
-    const optionsData = ['Starters', 'Mains', 'Desserts', 'Drinks'];
-    return (
-        optionsData.map((item)=>{
-            return <Text key={item} style={styles.ordersOptions}>{item}</Text>;
-        })
-    )
-  }
+  useUpdateEffect(() => {
+    (async () => {
+      const activeCategories = sections.filter((s, i) => {
+        // If all filters are deselected, all categories are active
+        if (filterSelections.every((item) => item === false)) {
+          return true;
+        }
+        return filterSelections[i];
+      });
+      try {
+        const menuItems = await filterByQueryAndCategories(
+          searchText,
+          activeCategories
+        );
+        setData(menuItems);
+      } catch (e) {
+        Alert.alert(e.message);
+      }
+    })();
+  }, [filterSelections, searchText]);
+
+  const lookup = useCallback((q) => {
+    onChangeSearchText(q);
+  }, []);
+
+  const debouncedLookup = useMemo(() => debounce(lookup, 500), [lookup]);
+
+  const handleSearchChange = (text) => {
+    setSearchBarText(text);
+    debouncedLookup(text);
+  };
+
+  const handleFiltersChange = async (index) => {
+    const arrayCopy = [...filterSelections];
+    arrayCopy[index] = !filterSelections[index];
+    setFilterSelections(arrayCopy);
+  };
 
   const ItemSeparator = () => (
     <View style={styles.separator} />
@@ -218,7 +271,11 @@ export default function Home({navigation}) {
                 <View style={styles.orders}>
                     <Text style={styles.titleOrders}>ORDER FOR DELIVERY!</Text>
                     <View style={styles.optionsContainer}>
-                        <Options />
+                      <Filters 
+                       selections={filterSelections}
+                       onChange={handleFiltersChange}
+                       sections={sections}
+                       />
                     </View>
                 </View>
 
@@ -310,22 +367,6 @@ const styles = StyleSheet.create({
     fontFamily: 'Karla-Regular',
     fontSize: 22,
     fontWeight: 'bold',
-  },
-  optionsContainer: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginHorizontal: 20,
-  },
-  ordersOptions: {
-    marginTop: 12,
-    paddingVertical: 6,
-    paddingHorizontal: 14,
-    backgroundColor: '#EDEFEE',
-    color: '#495e57',
-    fontFamily: 'Karla-Regular',
-    fontWeight: 'bold',
-    borderRadius: 12,
   },
   heroImage: {
     width: '30%',
