@@ -46,7 +46,7 @@ export default function App() {
 
   const clearData = async () => {
     try {
-      await AsyncStorage.removeItem('@onBoard');
+      await AsyncStorage.clear();
       console.log('Data cleared successfully!');
       setIsOnboardingCompleted(false);
     } catch (e) {
@@ -67,7 +67,9 @@ export default function App() {
               <Stack.Screen name="Profile" component={Profile} /> 
             </>
               )
-            : <Stack.Screen name="Onboarding" component={Onboarding} />
+            : <Stack.Screen name="Onboarding">
+                  {props => <Onboarding {...props} setIsOnboardingCompleted={setIsOnboardingCompleted} />}
+              </Stack.Screen>
         }
     </Stack.Navigator>
     </NavigationContainer>

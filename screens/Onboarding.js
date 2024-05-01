@@ -1,19 +1,36 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { View, ScrollView, Text, StyleSheet, TextInput, KeyboardAvoidingView, Platform, Pressable, Image} from 'react-native';
 import { validateEmail, validateName } from '../utils'
 import * as Font from 'expo-font';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native';
 
-export default function Onboarding({navigation}) {
+export default function Onboarding({navigation, setIsOnboardingCompleted}) {
   const [firstName, onChangeFirstName] = useState('');
   const [email, onChangeEmail] = useState('');
   const [clicked, setClicked] = useState(false);
+
+  // Agrega esto al inicio de tu componente Onboarding
+  useFocusEffect(
+    useCallback(() => {
+      // Aquí se ejecutará cuando el componente esté en foco
+      // Si la variable clicked es verdadera, es decir, si se han guardado los datos,
+      // recarga la aplicación.
+      if (clicked) {
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'Onboarding' }], // Asegúrate de que el nombre de la ruta coincida con el de tu componente
+        });
+      }
+    }, [clicked]) // La dependencia clicked asegura que esta función se ejecute cada vez que clicked cambie
+  );
 
   const storeData = async () => {
     try {
       await AsyncStorage.setItem('@onBoard', 'true');
       await AsyncStorage.setItem('@firstName', firstName);
       await AsyncStorage.setItem('@email', email);
+      setIsOnboardingCompleted(true);
     } catch (e) {
       console.error('Error storing data:', e);
     }

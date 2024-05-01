@@ -222,6 +222,10 @@ export default function Home({navigation}) {
     );
   }
 
+  const handlePress = () => {
+    navigation.navigate('Profile');
+  }
+
   return (
     !isLoading && 
     <KeyboardAvoidingView
@@ -232,12 +236,19 @@ export default function Home({navigation}) {
             <View style={styles.header}>
             
                 <Image style={styles.image} resizeMode="contain" source={require("../assets/images/Logo.png")} />
-                {image ? <Image source={{ uri: image }} 
-                            style={styles.imageProfileLittle} 
-                            resizeMode="cover" /> : (
-                            <View style={styles.imageNoProfileLittle}>
-                                <Text style={{ fontSize: 20, color: '#fff' }}>{initials}</Text>
-                            </View>)}
+                <Pressable style={image ? styles.imageProfileLittle : styles.imageNoProfileLittle} onPress={handlePress}>
+                {image ? (
+                  <Image
+                    source={{ uri: image }}
+                    style={styles.imageProfileLittle}
+                    resizeMode="cover"
+                  />
+                ) : (
+                  <View style={styles.imageNoProfileLittle}>
+                    <Text style={{ fontSize: 20, color: '#fff' }}>{initials}</Text>
+                  </View>
+                )}
+              </Pressable>
             </View>
             
             <ScrollView style={styles.scrollViewContent} keyboardDismissMode="on-drag">
@@ -510,6 +521,6 @@ const styles = StyleSheet.create({
   separator: {
     height: 1,
     backgroundColor: '#ccc',
-  },
+  }
 });
 
