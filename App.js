@@ -3,6 +3,7 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
 import Onboarding from './screens/Onboarding';
 import Splash from './screens/Splash';
+import Home from './screens/Home';
 import Profile from './screens/Profile';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -60,8 +61,12 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator>
-        { isOnboardingCompleted 
-            ? <Stack.Screen name="Profile" component={Profile} /> 
+        { isOnboardingCompleted ? (
+            <>
+              <Stack.Screen name="Home" component={Home} /> 
+              <Stack.Screen name="Profile" component={Profile} /> 
+            </>
+              )
             : <Stack.Screen name="Onboarding" component={Onboarding} />
         }
     </Stack.Navigator>
